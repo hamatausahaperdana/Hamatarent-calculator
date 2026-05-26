@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Sewa – PT Hamata Usaha Perdana</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#f5f4fe;min-height:100vh;padding:16px 12px 40px}
+.wrap{max-width:520px;margin:0 auto;color:#1a1a2e}
+.card{background:#fff;border:1px solid #e8e4ff;border-radius:14px;padding:16px 18px;margin-bottom:14px}
+.card-green{border-color:#c8f5b8}
+.lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:8px;display:block}
+.type-btn{width:100%;padding:13px 16px;border-radius:10px;border:1.5px solid #e0ddf5;background:#fafafe;color:#1a1a2e;cursor:pointer;font-weight:600;font-size:13px;font-family:'DM Sans',sans-serif;transition:all .15s;text-align:left;margin-bottom:8px}
+.type-btn.active{border:2px solid #1a1a2e;background:#1a1a2e;color:#fff}
+.btn{padding:13px 24px;border-radius:10px;border:none;background:#1a1a2e;color:#fff;cursor:pointer;font-weight:700;font-size:14px;font-family:'DM Sans',sans-serif;width:100%;margin-top:8px;display:block}
+.btn:disabled{background:#e0ddf5;color:#aaa;cursor:not-allowed}
+.btn-ghost{background:#f0eeff;color:#1a1a2e}
+.btn-wa{background:#25D366;display:flex;align-items:center;justify-content:center;gap:10px;font-size:15px}
+.btn-wa:disabled{background:#e0ddf5;color:#aaa}
+.btn-row{display:flex;gap:8px;margin-top:8px}
+.btn-row .btn{margin-top:0}
+.chk-item{padding:10px 14px;border-radius:10px;border:1.5px solid #e0ddf5;background:#fafafe;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:10;margin-bottom:8px}
+.chk-item.active{border:2px solid #1a1a2e;background:#f0eeff}
+.chk-box{width:20px;height:20px;border-radius:5px;flex-shrink:0;margin-top:1px;border:1.5px solid #ccc;background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff}
+.chk-box.checked{border:none;background:#1a1a2e}
+.inp{padding:9px 12px;border-radius:8px;border:1.5px solid #e0ddf5;font-size:13px;font-family:'DM Sans',sans-serif;width:100%;background:#fafafe}
+.inp:focus{outline:none;border-color:#534AB7}
+.info-box{background:#f0eeff;border-radius:10px;padding:10px 14px;font-size:12px;color:#534AB7;line-height:1.7;margin-top:12px}
+.warn-box{background:#FAEEDA;border-radius:12px;padding:13px 14px;margin-bottom:14px;border:1.5px solid #EF9F27}
+.err-box{margin-top:10px;font-size:12px;color:#A32D2D;background:#FCEBEB;border-radius:8px;padding:8px 12px}
+.ok-box{margin-top:8px;font-size:12px;color:#854F0B;background:#FAEEDA;border-radius:8px;padding:7px 10px}
+.yesno-row{display:flex;gap:8px;margin-bottom:10px}
+.yesno{flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #e0ddf5;background:#fafafe;color:#1a1a2e;cursor:pointer;font-weight:700;font-size:12px;font-family:'DM Sans',sans-serif;text-align:center;transition:all .15s;line-height:1.4}
+.yesno.active{border:2px solid #1a1a2e;background:#1a1a2e;color:#fff}
+.malam-sub{background:#fff;border-radius:10px;padding:12px;border:1px solid #EF9F27}
+/* Stepper */
+.stepper{display:flex;align-items:center;margin-bottom:24px;overflow-x:auto;padding-bottom:4px}
+.step-item{display:flex;align-items:center}
+.step-dot{width:28px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;background:#e0ddf5;color:#888;transition:all .3s}
+.step-dot.done{background:#1a1a2e;color:#fff}
+.step-dot.active{background:#1a1a2e;color:#fff}
+.step-label{font-size:9px;color:#aaa;font-weight:400;white-space:nowrap;text-align:center;margin-top:3px}
+.step-label.active{color:#1a1a2e;font-weight:700}
+.step-label.done{color:#1a1a2e}
+.step-line{width:22px;height:1.5px;background:#e0ddf5;margin:0 2px;margin-bottom:14px;transition:background .3s;flex-shrink:0}
+.step-line.done{background:#1a1a2e}
+/* Calendar */
+.cal-wrap{background:#fafafe;border:1.5px solid #e0ddf5;border-radius:12px;padding:14px;margin-bottom:14px}
+.cal-hint{font-size:12px;color:#534AB7;font-weight:600;margin-bottom:8px}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-nav button{background:none;border:none;cursor:pointer;font-size:20px;color:#1a1a2e;padding:0 8px}
+.cal-nav span{font-weight:700;font-size:14px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-day-hdr{text-align:center;font-size:11px;font-weight:700;color:#aaa;padding-bottom:6px}
+.cal-day{text-align:center;padding:4px 1px;font-size:11px;cursor:pointer;border-radius:6px;display:flex;flex-direction:column;align-items:center;gap:1px;transition:background .1s}
+.cal-day.past{color:#ccc;cursor:default}
+.cal-day.selected{background:#1a1a2e;color:#fff;font-weight:800}
+.cal-day.in-range{background:#e8e4ff;color:#1a1a2e;border-radius:0}
+.cal-day.range-start{background:#1a1a2e;color:#fff;font-weight:800;border-radius:6px 0 0 6px}
+.cal-day.range-end{background:#1a1a2e;color:#fff;font-weight:800;border-radius:0 6px 6px 0}
+.cal-price{font-size:9px;font-weight:600;line-height:1}
+.cal-legend{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.cal-legend-item{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600}
+.cal-legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+/* Date pickers */
+.date-row{display:flex;gap:10px;margin-bottom:14px}
+.date-field{flex:1}
+.date-field label{font-size:11px;color:#888;display:block;margin-bottom:4px}
+.date-display{padding:10px 14px;border-radius:8px;cursor:pointer;font-size:14px;background:#fafafe;border:1.5px solid #e0ddf5;color:#aaa;transition:border .15s}
+.date-display.filled{color:#1a1a2e;font-weight:600}
+.date-display.focused{border:2px solid #1a1a2e}
+/* Date summary */
+.date-summary{background:#f0eeff;border-radius:10px;padding:10px 14px;margin-bottom:10px}
+.date-pills{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 8px}
+.date-pill{font-size:10px;border-radius:4px;padding:2px 7px;font-weight:600}
+.date-total{font-size:13px;font-weight:700;color:#534AB7}
+/* Route */
+.route-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.route-dot{width:26px;height:26px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.route-static{flex:1;padding:9px 12px;border-radius:8px;background:#f0f0f0;font-size:13px;color:#888}
+.route-select{flex:1}
+.km-box{background:#f0eeff;border-radius:10px;padding:10px 14px;margin-bottom:10px}
+.add-route-btn{background:#f0eeff;border:1.5px dashed #c8b8ff;border-radius:8px;padding:9px 16px;cursor:pointer;font-size:13px;color:#534AB7;font-weight:600;width:100%;margin-bottom:10px;font-family:'DM Sans',sans-serif}
+.del-btn{background:#FCEBEB;border:none;border-radius:8px;padding:8px 10px;cursor:pointer;color:#A32D2D;font-weight:700;font-size:14px;flex-shrink:0}
+/* Result */
+.result-hero{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.result-total-lbl{font-size:12px;color:#888}
+.result-total-num{font-size:28px;font-weight:900;letter-spacing:-1px}
+.result-badge{background:#c8f5b8;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:700}
+.rute-summary{background:#f0eeff;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px}
+.rrow{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f0eeff;font-size:14px;gap:8px}
+.rrow:last-child{border-bottom:none}
+.rrow-sub{display:flex;justify-content:space-between;font-size:11px;padding:2px 0;color:#555}
+.rrow-sub-wrap{padding-left:12px;padding-bottom:6px}
+.rrow-total{display:flex;justify-content:space-between;padding:12px 0 4px;font-size:17px;font-weight:800}
+.fw6{font-weight:600}
+.disclaimer{font-size:11px;color:#888;margin-top:8px;padding:8px 12px;background:#fafafe;border-radius:8px}
+/* Terms modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;display:flex;align-items:flex-end;justify-content:center}
+.modal-box{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column}
+.modal-hdr{padding:16px 20px 10px;border-bottom:1px solid #f0eeff;display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:16px;font-weight:800}
+.modal-sub{font-size:11px;color:#888;margin-top:2px}
+.modal-close{background:#f0f0f0;border:none;border-radius:999px;width:32px;height:32px;cursor:pointer;font-size:16px;font-weight:700;color:#555}
+.modal-body{overflow-y:auto;padding:12px 20px 24px;flex:1}
+.modal-intro{background:#f0eeff;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#534AB7;line-height:1.6}
+.modal-footer{padding:12px 20px;border-top:1px solid #f0eeff}
+.terms-item{border-bottom:1px solid #f0eeff;margin-bottom:4px}
+.terms-btn{width:100%;background:none;border:none;cursor:pointer;padding:12px 0;display:flex;justify-content:space-between;align-items:center;font-family:'DM Sans',sans-serif;text-align:left}
+.terms-btn-title{font-size:13px;font-weight:700;color:#1a1a2e}
+.terms-btn-arrow{font-size:16px;color:#888;flex-shrink:0;margin-left:8px;transition:transform .2s}
+.terms-body{font-size:13px;color:#444;line-height:1.7;padding-bottom:12px;padding-right:8px;display:none}
+/* Agree checkbox */
+.agree-row{display:flex;align-items:flex-start;gap:12px}
+.agree-box{width:22px;height:22px;border-radius:6px;flex-shrink:0;margin-top:1px;cursor:pointer;border:1.5px solid #ccc;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;transition:all .15s}
+.agree-box.checked{border:none;background:#1a1a2e}
+.agree-text{font-size:13px;color:#444;line-height:1.6}
+.agree-link{color:#534AB7;font-weight:700;cursor:pointer;text-decoration:underline}
+textarea.inp{resize:vertical;line-height:1.6}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+    <div style="width:40px;height:40px;border-radius:12px;background:#1a1a2e;display:flex;align-items:center;justify-content:center;font-size:20px">🚐</div>
+    <div>
+      <div style="font-size:20px;font-weight:900;letter-spacing:-0.5px">Kalkulator Sewa</div>
+      <div style="font-size:12px;color:#888">PT Hamata Usaha Perdana · Pekanbaru</div>
+    </div>
+  </div>
+
+  <!-- Stepper -->
+  <div class="stepper" id="stepper"></div>
+
+  <!-- Steps -->
+  <div id="step1"></div>
+  <div id="step2"></div>
+  <div id="step3"></div>
+  <div id="step4"></div>
+  <div id="step5"></div>
+
+</div>
+
+<!-- Terms Modal -->
+<div class="modal-bg hidden" id="termsModal">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div>
+        <div class="modal-title">Syarat &amp; Ketentuan</div>
+        <div class="modal-sub">PT Hamata Usaha Perdana · Pekanbaru</div>
+      </div>
+      <button class="modal-close" onclick="closeTerms()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-intro">Dengan melakukan pemesanan, penyewa dianggap telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan berikut.</div>
+      <div id="termsList"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeTerms()">Oke, Saya Mengerti!</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────
+const PHONE_WA="6285220938800";
+const BASE_RATES={
+  end_user_kota:{label:"End User – Dalam Kota",harian:1300000},
+  end_user_luar:{label:"End User – Luar Kota",harian:1500000}
+};
+const WEEKDAY_DISC=200000,HARGA_BIOSOLAR=10000,KM_PER_LITER=8;
+const MAKAN_SUPIR=75000,AKOMODASI_SUPIR=150000,KM_MUTAR_HARI=30;
+
+const HOLIDAYS=new Set(["2025-01-01","2025-01-27","2025-01-28","2025-01-29",
+  "2025-03-29","2025-03-30","2025-03-31","2025-04-01","2025-04-07","2025-04-18",
+  "2025-05-01","2025-05-12","2025-05-29","2025-06-01","2025-06-06","2025-08-17",
+  "2025-09-05","2025-10-02","2025-12-25","2025-12-26","2026-01-01","2026-01-16",
+  "2026-03-20","2026-03-21","2026-03-22","2026-04-03","2026-04-10","2026-05-01",
+  "2026-05-14","2026-05-25","2026-06-01","2026-08-17","2026-12-25"]);
+
+const PEAK_RANGES=[["2025-03-28","2025-04-07"],["2025-12-20","2026-01-05"],
+  ["2026-06-20","2026-07-20"],["2026-03-19","2026-03-29"]];
+
+const CITY_DIST={Pekanbaru:0,Padang:300,Bukittinggi:226,Payakumbuh:188,
+  "Alahan Panjang":320,Medan:600,"Samosir / Parapat":750,
+  Jakarta:1650,Bandung:1800,Dumai:131,Batam:400,Lirik:120};
+
+const TOL_EST={Padang:150000,Bukittinggi:100000,Payakumbuh:80000,
+  "Alahan Panjang":120000,Medan:430000,"Samosir / Parapat":500000,
+  Jakarta:1200000,Bandung:1350000,Dumai:257000,Batam:0,Lirik:40000};
+
+const TERMS=[
+  {t:"Jam Operasional",b:"Sewa dimulai pukul 05.00 WIB dan berakhir pukul 23.00 WIB. Penggunaan di luar jam ini tidak diperkenankan kecuali dengan perjanjian khusus."},
+  {t:"Biaya Berkendara Malam",b:"Apabila pengemudi diminta beroperasi antara pukul 22.00 – 05.00 WIB, biaya akomodasi pengemudi sebesar Rp 150.000 per malam akan dikenakan."},
+  {t:"Bahan Bakar",b:"Kendaraan menggunakan Biosolar. Estimasi biaya bahan bakar dihitung berdasarkan rute yang disepakati. Selisih aktual vs estimasi dikonfirmasi saat pemesanan."},
+  {t:"Tol, Parkir & Biaya Tambahan",b:"Biaya tol, parkir, tiket penyeberangan, dan biaya tambahan lainnya ditanggung penyewa dan dihitung aktual saat perjalanan."},
+  {t:"Pengemudi",b:"Pengemudi disediakan oleh Hamata untuk paket end user. Penyewa dilarang meminta pengemudi melanggar peraturan lalu lintas atau mengemudi dalam kondisi kelelahan."},
+  {t:"Kapasitas & Barang Bawaan",b:"Kapasitas maksimal 14 penumpang. Barang bawaan tidak boleh melebihi kapasitas bagasi. Hamata berhak menolak perjalanan jika kapasitas terlampaui."},
+  {t:"Kerusakan & Tanggung Jawab",b:"Penyewa bertanggung jawab atas kerusakan akibat kelalaian atau kesengajaan. Kerusakan mekanis akibat pemakaian normal ditanggung Hamata."},
+  {t:"Pembatalan",b:"Pembatalan minimal 24 jam sebelum keberangkatan. Pembatalan kurang dari 24 jam dikenakan biaya sesuai kebijakan. Konfirmasi via WhatsApp."},
+  {t:"Harga & Estimasi",b:"Harga yang ditampilkan adalah estimasi. Harga final dan diskon dikonfirmasi oleh Hamata. Harga dapat berubah pada periode peak season, libur, dan weekend."},
+  {t:"Privasi & Data",b:"Data yang diberikan hanya digunakan untuk keperluan pemesanan dan komunikasi layanan Hamata. Data tidak dibagikan kepada pihak ketiga."}
+];
+
+const MONTHS=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+const DAYS=["Min","Sen","Sel","Rab","Kam","Jum","Sab"];
+
+// ─── STATE ──────────────────────────────────────────────────
+let step=1,custType=null,startDate=null,endDate=null;
+let calOpen=true,calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),selecting="start";
+let addons={biosolar:true,makan:true,akomodasi:false,tol:false,penyeberangan:false,parkir:false,porter:false};
+let penyeberanganAmt=200000,parkirAmt=50000,porterAmt=0;
+let routes=["Pekanbaru"],customKm=null;
+let malamAnswer=null,malamMalam="",catatanUser="",agreedTerms=false;
+
+// ─── HELPERS ────────────────────────────────────────────────
+function toStr(d){return d.toISOString().slice(0,10);}
+function isPeak(d){const s=toStr(d);return PEAK_RANGES.some(([a,b])=>s>=a&&s<=b);}
+function isHoli(d){return HOLIDAYS.has(toStr(d));}
+function isWknd(d){const n=d.getDay();return n===0||n===5||n===6;}
+function getDT(d){
+  if(isPeak(d))  return{label:"Peak Season",  color:"#A32D2D",bg:"#FCEBEB",disc:false};
+  if(isHoli(d))  return{label:"Libur Nas.",   color:"#854F0B",bg:"#FAEEDA",disc:false};
+  if(isWknd(d))  return{label:"Weekend",      color:"#0F6E56",bg:"#E1F5EE",disc:false};
+  return              {label:"Hari Biasa",   color:"#3C3489",bg:"#EEEDFE",disc:true};
+}
+function dayRate(base,dt){return dt.disc?base-WEEKDAY_DISC:base;}
+function fmtRp(n){return"Rp "+Math.round(n).toLocaleString("id-ID");}
+function fmtDate(d){return d?d.toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"}):"Pilih tanggal";}
+function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function daysBetween(a,b){return Math.round((b-a)/86400000)+1;}
+const numDays=()=>startDate&&endDate?daysBetween(startDate,endDate):0;
+const isMultiDay=()=>numDays()>1;
+
+function dayBreakdown(){
+  if(!startDate||!endDate||!custType)return[];
+  const base=BASE_RATES[custType].harian;
+  return Array.from({length:numDays()},(_,i)=>{
+    const d=addDays(startDate,i);
+    const dt=getDT(d);
+    return{date:d,...dt,price:dayRate(base,dt)};
+  });
+}
+function sewaTotal(){return dayBreakdown().reduce((s,d)=>s+d.price,0);}
+function estimasiKm(){
+  if(customKm)return customKm;
+  let trip=0;
+  for(let i=1;i<routes.length;i++){
+    const a=CITY_DIST[routes[i-1]]??0;
+    const b=CITY_DIST[routes[i]]??0;
+    trip+=Math.abs(b-a)||Math.max(b,a);
+  }
+  trip+=CITY_DIST[routes[routes.length-1]]??0;
+  trip+=KM_MUTAR_HARI*numDays();
+  return trip;
+}
+function biosolarTotal(){return Math.round(estimasiKm()/KM_PER_LITER)*HARGA_BIOSOLAR;}
+function tolTotal(){return routes.reduce((s,r)=>s+(TOL_EST[r]||0),0);}
+function jumlahMalamVal(){return malamAnswer==="ya"&&malamMalam!==""?Math.max(0,parseInt(malamMalam)||0):0;}
+// Poin 3: akomodasi dihitung dari malam BERIKUTNYA setelah berkendara malam
+// Supir berkendara malam X malam → butuh istirahat/akomodasi X malam berikutnya
+function akomodasiMalamTotal(){return jumlahMalamVal()*AKOMODASI_SUPIR;}
+
+// Poin 4: surcharge Rp100k/hari untuk rute jauh (Sumut, Aceh, Palembang, Jawa)
+const SURCHARGE_CITIES=new Set(["Medan","Samosir / Parapat","Jakarta","Bandung"]);
+const SURCHARGE_KEYWORDS=["aceh","palembang","sumatera utara","sumut","medan","toba",
+  "siantar","rantau","java","jawa","surabaya","yogyakarta","semarang","solo","malang"];
+const SURCHARGE_PER_DAY=100000;
+function hasSurcharge(){
+  for(const r of routes){
+    if(SURCHARGE_CITIES.has(r)) return true;
+    const rl=r.toLowerCase();
+    if(SURCHARGE_KEYWORDS.some(k=>rl.includes(k))) return true;
+  }
+  return false;
+}
+function surchargeTotal(){return hasSurcharge()?SURCHARGE_PER_DAY*numDays():0;}
+
+function grandTotal(){
+  let t=sewaTotal();
+  if(addons.biosolar)      t+=biosolarTotal();
+  if(addons.makan)         t+=numDays()*MAKAN_SUPIR;
+  if(addons.akomodasi)     t+=numDays()*AKOMODASI_SUPIR;
+  t+=akomodasiMalamTotal();
+  t+=surchargeTotal();
+  if(addons.tol)           t+=tolTotal();
+  if(addons.penyeberangan) t+=penyeberanganAmt;
+  if(addons.parkir)        t+=parkirAmt*numDays();
+  if(addons.porter)        t+=porterAmt;
+  return t;
+}
+function addonsComplete(){
+  return !isMultiDay()||(malamAnswer==="tidak"||(malamAnswer==="ya"&&malamMalam!==""));
+}
+
+// ─── RENDER ─────────────────────────────────────────────────
+function render(){
+  renderStepper();
+  document.getElementById("step1").innerHTML="";
+  document.getElementById("step2").innerHTML="";
+  document.getElementById("step3").innerHTML="";
+  document.getElementById("step4").innerHTML="";
+  document.getElementById("step5").innerHTML="";
+  if(step===1) renderStep1();
+  if(step===2) renderStep2();
+  if(step===3) renderStep3();
+  if(step===4) renderStep4();
+  if(step===5) renderStep5();
+  renderTermsList();
+}
+
+function renderStepper(){
+  const labels=["Tipe Sewa","Tanggal","Biaya","Rute","Hasil"];
+  let h="";
+  for(let i=0;i<5;i++){
+    const s=i+1;
+    const done=step>s,active=step===s;
+    h+=`<div class="step-item">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+        <div class="step-dot ${done?"done":active?"active":""}">${done?"✓":s}</div>
+        <div class="step-label ${done?"done":active?"active":""}">${labels[i]}</div>
+      </div>`;
+    if(i<4) h+=`<div class="step-line ${step>s?"done":""}"></div>`;
+    h+="</div>";
+  }
+  document.getElementById("stepper").innerHTML=h;
+}
+
+// ── STEP 1 ──
+function renderStep1(){
+  const btns=Object.entries(BASE_RATES).map(([k,v])=>`
+    <button class="type-btn ${custType===k?"active":""}" onclick="setCust('${k}')">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span>${v.label}</span>
+        <span style="font-weight:400;font-size:12px;opacity:.7">mulai ${fmtRp(v.harian)}/hari</span>
+      </div>
+    </button>`).join("");
+  document.getElementById("step1").innerHTML=`
+    <div class="card">
+      <span class="lbl">Kamu mau sewa sebagai?</span>
+      ${btns}
+      <div class="info-box">
+        <span style="font-weight:700">⏰ Info Jam Sewa</span><br>
+        Sewa mulai dari jam <strong>05.00 WIB</strong> dan selesai maksimal jam <strong>23.00 WIB</strong>.<br>
+        <span style="color:#888;font-size:11px">Di luar jam ini, perlu perjanjian khusus dengan tim PT Hamata Usaha Perdana.</span>
+      </div>
+      <button class="btn" ${!custType?"disabled":""} onclick="goStep(2)">Pilih Tanggal →</button>
+    </div>`;
+}
+function setCust(k){custType=k;render();}
+
+// ── STEP 2 ──
+function renderStep2(){
+  const bd=dayBreakdown();
+  const summaryHtml=startDate&&endDate?`
+    <div class="date-summary">
+      <div style="font-size:13px;font-weight:700;margin-bottom:6px">${numDays()} hari · ${fmtDate(startDate)} – ${fmtDate(endDate)}</div>
+      <div class="date-pills">${bd.slice(0,10).map(d=>`
+        <span class="date-pill" style="background:${d.bg};color:${d.color}">${d.date.getDate()}/${d.date.getMonth()+1} · ${fmtRp(d.price)}</span>`).join("")}
+        ${bd.length>10?`<span style="font-size:10px;color:#888">+${bd.length-10} hari lagi</span>`:""}
+      </div>
+      <div class="date-total">💰 Estimasi sewa: ${fmtRp(sewaTotal())}</div>
+    </div>`:"";;
+
+  const calHtml=calOpen?`
+    <div class="cal-wrap">
+      <div class="cal-hint">${selecting==="start"?"📅 Klik tanggal berangkat":"📅 Klik tanggal selesai sewa"}</div>
+      ${renderCalendar()}
+    </div>`:"";
+
+  document.getElementById("step2").innerHTML=`
+    <div class="card">
+      <span class="lbl">Kapan rencana perjalanannya?</span>
+      <div class="date-row">
+        <div class="date-field">
+          <label>Tanggal mulai</label>
+          <div class="date-display ${startDate?"filled":""} ${selecting==="start"&&calOpen?"focused":""}" onclick="openCal('start')">${fmtDate(startDate)}</div>
+        </div>
+        <div class="date-field">
+          <label>Tanggal selesai</label>
+          <div class="date-display ${endDate?"filled":""} ${selecting==="end"&&calOpen?"focused":""}" onclick="openCal('end')">${fmtDate(endDate)}</div>
+        </div>
+      </div>
+      ${calHtml}
+      ${summaryHtml}
+      <div class="btn-row">
+        <button class="btn btn-ghost" style="flex:1" onclick="goStep(1)">← Kembali</button>
+        <button class="btn" style="flex:2" ${!(startDate&&endDate)?"disabled":""} onclick="goStep(3)">Lanjut →</button>
+      </div>
+    </div>`;
+}
+
+function renderCalendar(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const dim=new Date(calYear,calMonth+1,0).getDate();
+  let cells=`<div class="cal-nav">
+    <button onclick="navCal(-1)">‹</button>
+    <span>${MONTHS[calMonth]} ${calYear}</span>
+    <button onclick="navCal(1)">›</button>
+  </div>
+  <div class="cal-grid">
+    ${DAYS.map(d=>`<div class="cal-day-hdr">${d}</div>`).join("")}`;
+  for(let i=0;i<firstDay;i++) cells+=`<div></div>`;
+  for(let d=1;d<=dim;d++){
+    const date=new Date(calYear,calMonth,d);
+    const past=date<today;
+    const isStart=startDate&&date.toDateString()===startDate.toDateString();
+    const isEnd=endDate&&date.toDateString()===endDate.toDateString();
+    const inRange=startDate&&endDate&&date>startDate&&date<endDate;
+    const dt=getDT(date);
+    const base=custType?BASE_RATES[custType].harian:null;
+    const price=base?dayRate(base,dt):null;
+    let cls="cal-day";
+    if(past) cls+=" past";
+    else if(isStart&&inRange) cls+=" range-start";
+    else if(isEnd&&inRange)   cls+=" range-end";
+    else if(isStart||isEnd)   cls+=" selected";
+    else if(inRange)          cls+=" in-range";
+    const bgStyle=(!past&&!isStart&&!isEnd&&!inRange)?`style="background:${dt.bg}"` :"";
+    const priceSpan=price&&!past?`<span class="cal-price" style="color:${isStart||isEnd?"#c8f5b8":dt.color}">${(price/1000).toFixed(0)}k</span>`:"";
+    const ds=toStr(date);
+    cells+=`<div class="${cls}" ${bgStyle} onclick="${past?"":"calClick('"+ds+"')"}">${d}${priceSpan}</div>`;
+  }
+  cells+="</div>";
+  cells+=`<div class="cal-legend">
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#E1F5EE"></div><span style="color:#0F6E56">Weekend</span></div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#FAEEDA"></div><span style="color:#854F0B">Libur Nas.</span></div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#FCEBEB"></div><span style="color:#A32D2D">Peak Season</span></div>
+    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#EEEDFE"></div><span style="color:#3C3489">Hari Biasa</span></div>
+  </div>`;
+  return cells;
+}
+
+function openCal(sel){
+  if(sel==="end"&&!startDate)return;
+  selecting=sel;calOpen=true;render();
+}
+function navCal(dir){
+  calMonth+=dir;
+  if(calMonth<0){calMonth=11;calYear--;}
+  if(calMonth>11){calMonth=0;calYear++;}
+  render();
+}
+function calClick(ds){
+  const date=new Date(ds+"T00:00:00");
+  if(selecting==="start"){startDate=date;endDate=null;selecting="end";}
+  else{
+    if(date<startDate){startDate=date;endDate=null;selecting="end";}
+    else{endDate=date;selecting="start";calOpen=false;}
+  }
+  render();
+}
+
+// ── STEP 3 ──
+function renderStep3(){
+  const multi=isMultiDay();
+  let malamHtml="";
+  if(multi){
+    const subHtml=malamAnswer==="ya"?`
+      <div class="malam-sub">
+        <div style="font-size:13px;color:#633806;font-weight:600;margin-bottom:8px">Berapa malam supir berkendara di jam tersebut? Biaya akomodasi dihitung untuk malam berikutnya.</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="number" min="1" max="${numDays()}" placeholder="Contoh: 1 (maks ${numDays()} malam)"
+            value="${malamMalam}" oninput="setMalamMalam(this.value)"
+            class="inp" style="flex:1">
+          <span style="font-size:13px;color:#854F0B;font-weight:600;white-space:nowrap">malam</span>
+        </div>
+        ${malamMalam!==""&&parseInt(malamMalam)>0?`
+          <div class="ok-box">Supir berkendara malam selama <strong>${parseInt(malamMalam)} malam</strong>. Biaya akomodasi malam berikutnya: <strong>${fmtRp(AKOMODASI_SUPIR)} × ${parseInt(malamMalam)} = ${fmtRp(parseInt(malamMalam)*AKOMODASI_SUPIR)}</strong> — sudah ditambahkan otomatis.</div>`:""}
+      </div>`:"";
+    malamHtml=`
+      <div class="warn-box">
+        <div style="font-size:12px;font-weight:800;color:#633806;margin-bottom:2px">⚠️ Pertanyaan Wajib</div>
+        <div style="font-size:13px;color:#633806;margin-bottom:10px;line-height:1.6">
+          Apakah supir perlu berkendara di antara <strong>jam 22.00 malam – 05.00 subuh</strong>?
+        </div>
+        <div class="yesno-row">
+          <button class="yesno ${malamAnswer==="ya"?"active":""}" onclick="setMalamAnswer('ya')">✅ Ya, ada berkendara malam</button>
+          <button class="yesno ${malamAnswer==="tidak"?"active":""}" onclick="setMalamAnswer('tidak')">Tidak ada</button>
+        </div>
+        ${subHtml}
+      </div>`;
+  }
+
+  const addonList=[
+    {key:"biosolar",icon:"⛽",title:"Biosolar",desc:"Estimasi bahan bakar selama perjalanan"},
+    {key:"makan",icon:"🍱",title:"Makan Supir",desc:`${fmtRp(MAKAN_SUPIR)} per hari`},
+    {key:"akomodasi",icon:"🛏️",title:"Akomodasi Supir (ekstra)",desc:`${fmtRp(AKOMODASI_SUPIR)} per malam — di luar biaya berkendara malam`},
+    {key:"tol",icon:"🛣️",title:"Tol",desc:"Estimasi berdasarkan rute — dihitung aktual saat perjalanan"},
+    {key:"penyeberangan",icon:"⛴️",title:"Tiket Penyeberangan",desc:"Feri Selat Sunda, Batam, dll"},
+    {key:"parkir",icon:"🅿️",title:"Parkir",desc:`${fmtRp(parkirAmt)} per hari`},
+    {key:"porter",icon:"🧳",title:"Porter / Jasa Angkut",desc:"Kalau butuh bantuan angkat barang"},
+  ];
+  const addonHtml=addonList.map(({key,icon,title,desc})=>{
+    const a=addons[key];
+    let extra="";
+    if(key==="penyeberangan"&&a) extra=`<input type="number" value="${penyeberanganAmt}" oninput="setPenyeberangan(this.value)" class="inp" style="margin-top:4px" placeholder="Nominal tiket penyeberangan">`;
+    if(key==="parkir"&&a)        extra=`<input type="number" value="${parkirAmt}" oninput="setParkir(this.value)" class="inp" style="margin-top:4px" placeholder="Biaya parkir per hari">`;
+    if(key==="porter"&&a)        extra=`<input type="number" value="${porterAmt}" oninput="setPorter(this.value)" class="inp" style="margin-top:4px" placeholder="Biaya porter total">`;
+    return`<div>
+      <div class="chk-item ${a?"active":""}" onclick="toggleAddon('${key}')">
+        <div class="chk-box ${a?"checked":""}">${a?"✓":""}</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600">${icon} ${title}</div><div style="font-size:11px;color:#888;margin-top:1px">${desc}</div></div>
+      </div>${extra}
+    </div>`;
+  }).join("");
+
+  const errHtml=multi&&malamAnswer===null?`<div class="err-box">Jawab dulu pertanyaan berkendara malam di atas ya 👆</div>`
+    :multi&&malamAnswer==="ya"&&malamMalam===""?`<div class="err-box">Isi dulu estimasi berapa malamnya ya 👆</div>`:"";
+
+  document.getElementById("step3").innerHTML=`
+    <div class="card">
+      <span class="lbl">Mau include biaya apa aja?</span>
+      ${malamHtml}
+      ${addonHtml}
+      ${errHtml}
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn btn-ghost" style="flex:1" onclick="goStep(2)">← Kembali</button>
+        <button class="btn" style="flex:2" ${!addonsComplete()?"disabled":""} onclick="goStep(4)">Lanjut →</button>
+      </div>
+    </div>`;
+}
+function setMalamAnswer(v){malamAnswer=v;if(v==="tidak")malamMalam="";render();}
+function setMalamMalam(v){malamMalam=v;render();}
+function toggleAddon(k){addons[k]=!addons[k];render();}
+function setPenyeberangan(v){penyeberanganAmt=parseInt(v)||0;}
+function setParkir(v){parkirAmt=parseInt(v)||0;}
+function setPorter(v){porterAmt=parseInt(v)||0;}
+
+// ── STEP 4 ──
+function renderStep4(){
+  let routeRows="";
+  routes.forEach((r,i)=>{
+    if(i===0){
+      routeRows+=`<div class="route-row">
+        <div class="route-dot" style="background:#c8f5b8">📍</div>
+        <div class="route-static">Pekanbaru (titik awal)</div>
+      </div>`;
+    } else {
+      const cityOpts=Object.keys(CITY_DIST).filter(c=>c!=="Pekanbaru").map(c=>`<option value="${c}" ${r===c?"selected":""}>${c}</option>`).join("");
+      const isCustom=r!==""&&!CITY_DIST.hasOwnProperty(r);
+      const customInput=isCustom?`<input placeholder="Nama kota" value="${r}" oninput="setRoute(${i},this.value)" class="inp route-select">`:"";
+      routeRows+=`<div class="route-row">
+        <div class="route-dot" style="background:#f0eeff;color:#534AB7;font-size:11px">${i}</div>
+        <select class="inp route-select" onchange="selectRoute(${i},this.value)">
+          <option value="">-- Pilih Kota --</option>
+          ${cityOpts}
+          <option value="__custom__" ${isCustom?"selected":""}>Kota lain (manual)</option>
+        </select>
+        ${customInput}
+        ${routes.length>2?`<button class="del-btn" onclick="delRoute(${i})">✕</button>`:""}
+      </div>`;
+    }
+  });
+  const km=estimasiKm();
+  document.getElementById("step4").innerHTML=`
+    <div class="card">
+      <span class="lbl">Kemana aja tujuannya?</span>
+      <div style="font-size:12px;color:#888;margin-bottom:12px">Start selalu dari Pekanbaru. Tambah tujuan bebas. Jarak PP + ${KM_MUTAR_HARI} km/hari mutar-mutar dihitung otomatis.</div>
+      ${routeRows}
+      <button class="add-route-btn" onclick="addRoute()">+ Tambah Tujuan</button>
+      <div class="route-row">
+        <div class="route-dot" style="background:#c8f5b8">📍</div>
+        <div class="route-static">Kembali ke Pekanbaru</div>
+      </div>
+      <div class="km-box" style="margin-top:10px">
+        <div style="font-size:12px;color:#534AB7;font-weight:700;margin-bottom:4px">📍 Estimasi Total Jarak</div>
+        <div style="font-size:22px;font-weight:900">±${km} km</div>
+        <div style="font-size:11px;color:#888;margin-top:2px">Sudah termasuk pulang ke Pekanbaru + ${KM_MUTAR_HARI} km/hari untuk pergerakan lokal (${KM_MUTAR_HARI*numDays()} km total)</div>
+        <div style="margin-top:8px">
+          <div style="font-size:11px;color:#888;margin-bottom:4px">Kalau kamu tahu jarak pastinya, bisa diisi di sini:</div>
+          <input type="number" placeholder="Masukkan total km manual (opsional)" value="${customKm||""}" oninput="setCustomKm(this.value)" class="inp">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" style="flex:1" onclick="goStep(3)">← Kembali</button>
+        <button class="btn" style="flex:2" ${routes.length<2?"disabled":""} onclick="goStep(5)">Lihat Estimasi Biaya →</button>
+      </div>
+    </div>`;
+}
+function addRoute(){routes.push("");render();}
+function delRoute(i){routes.splice(i,1);render();}
+function selectRoute(i,v){routes[i]=v==="__custom__"?"":v;render();}
+function setRoute(i,v){routes[i]=v;}
+function setCustomKm(v){customKm=v?parseInt(v):null;}
+
+// ── STEP 5 ──
+function renderStep5(){
+  const nd=numDays(),km=estimasiKm();
+  const bd=dayBreakdown();
+  let perDayHtml="";
+  if(nd<=14){
+    perDayHtml=`<div class="rrow-sub-wrap">${bd.map(d=>`
+      <div class="rrow-sub">
+        <span>${d.date.toLocaleDateString("id-ID",{weekday:"short",day:"2-digit",month:"short"})}
+          <span style="margin-left:6px;background:${d.bg};color:${d.color};border-radius:3px;padding:1px 5px;font-weight:600">${d.label}</span>
+        </span>
+        <span class="fw6">${fmtRp(d.price)}</span>
+      </div>`).join("")}</div>`;
+  }
+  const akmTotal=akomodasiMalamTotal();
+  const jmv=jumlahMalamVal();
+  const surch=surchargeTotal();
+  const hasSurch=hasSurcharge();
+  const waDisabled=!agreedTerms;
+
+  document.getElementById("step5").innerHTML=`
+    <div class="card card-green">
+      <div class="result-hero">
+        <div>
+          <div class="result-total-lbl">Total Estimasi Biaya</div>
+          <div class="result-total-num">${fmtRp(grandTotal())}</div>
+        </div>
+        <div class="result-badge">${nd} hari</div>
+      </div>
+      <div class="rute-summary">🗺️ <strong>${routes.join(" → ")} → Pekanbaru</strong> <span style="color:#888;margin-left:6px">±${km} km</span></div>
+      <div>
+        <div class="rrow"><span>Sewa unit + driver (${nd} hari)</span><span class="fw6">${fmtRp(sewaTotal())}</span></div>
+        ${perDayHtml}
+        ${addons.biosolar?`<div class="rrow"><span>⛽ Biosolar (±${km} km)</span><span class="fw6">${fmtRp(biosolarTotal())}</span></div>`:""}
+        ${addons.makan?`<div class="rrow"><span>🍱 Makan supir (${nd} hari)</span><span class="fw6">${fmtRp(nd*MAKAN_SUPIR)}</span></div>`:""}
+        ${addons.akomodasi?`<div class="rrow"><span>🛏️ Akomodasi supir (${nd} malam)</span><span class="fw6">${fmtRp(nd*AKOMODASI_SUPIR)}</span></div>`:""}
+        ${akmTotal>0?`<div class="rrow"><span>🌙 Akomodasi berkendara malam (${jmv} malam berikutnya)</span><span class="fw6">${fmtRp(akmTotal)}</span></div>`:""}
+        ${hasSurch?`<div class="rrow"><span>🛤️ Surcharge rute jauh (${nd} hari × ${fmtRp(SURCHARGE_PER_DAY)})</span><span class="fw6">${fmtRp(surch)}</span></div>`:""}
+        ${addons.tol?`<div class="rrow"><span>🛣️ Tol estimasi <span style="font-size:11px;color:#888;font-weight:400">— dihitung aktual saat perjalanan</span></span><span class="fw6">${fmtRp(tolTotal())}</span></div>`:""}
+        ${addons.penyeberangan?`<div class="rrow"><span>⛴️ Tiket penyeberangan</span><span class="fw6">${fmtRp(penyeberanganAmt)}</span></div>`:""}
+        ${addons.parkir?`<div class="rrow"><span>🅿️ Parkir (${nd} hari)</span><span class="fw6">${fmtRp(nd*parkirAmt)}</span></div>`:""}
+        ${addons.porter?`<div class="rrow"><span>🧳 Porter</span><span class="fw6">${fmtRp(porterAmt)}</span></div>`:""}
+        <div class="rrow-total"><span>Total Estimasi</span><span>${fmtRp(grandTotal())}</span></div>
+      </div>
+      <div class="disclaimer">⚠️ Estimasi berdasarkan data sistem. Untuk harga final dan diskon dikonfirmasi PT Hamata Usaha Perdana.</div>
+    </div>
+
+    <div class="card">
+      <span class="lbl">Ada catatan atau permintaan khusus? (opsional)</span>
+      <textarea class="inp" rows="3" placeholder="Contoh: tolong siapkan selimut ekstra, rombongan ada lansia, butuh berhenti di rest area tertentu, dll..."
+        oninput="setCatatan(this.value)">${catatanUser}</textarea>
+      <div style="font-size:11px;color:#aaa;margin-top:4px">Catatan ini akan ikut terkirim ke WhatsApp PT Hamata Usaha Perdana.</div>
+    </div>
+
+    <div class="card">
+      <div class="agree-row">
+        <div class="agree-box ${agreedTerms?"checked":""}" onclick="toggleAgree()">${agreedTerms?"✓":""}</div>
+        <div class="agree-text">Saya sudah membaca dan setuju dengan <span class="agree-link" onclick="openTerms()">Syarat &amp; Ketentuan</span> PT Hamata Usaha Perdana.</div>
+      </div>
+    </div>
+
+    <button class="btn btn-wa" ${waDisabled?"disabled":""} onclick="openWA()">
+      <span style="font-size:20px">💬</span> Kirim ke WhatsApp Hamata
+    </button>
+    <button class="btn btn-ghost" onclick="resetAll()" style="margin-top:8px">Hitung Ulang dari Awal</button>`;
+}
+function setCatatan(v){catatanUser=v;}
+function toggleAgree(){agreedTerms=!agreedTerms;render();}
+
+// ── TERMS ──
+function renderTermsList(){
+  document.getElementById("termsList").innerHTML=TERMS.map((t,i)=>`
+    <div class="terms-item">
+      <button class="terms-btn" onclick="toggleTerm(${i})">
+        <span class="terms-btn-title">${i+1}. ${t.t}</span>
+        <span class="terms-btn-arrow" id="tarr${i}">›</span>
+      </button>
+      <div class="terms-body" id="tbody${i}">${t.b}</div>
+    </div>`).join("");
+}
+function toggleTerm(i){
+  const b=document.getElementById("tbody"+i);
+  const a=document.getElementById("tarr"+i);
+  const open=b.style.display==="block";
+  b.style.display=open?"none":"block";
+  a.style.transform=open?"":"rotate(90deg)";
+}
+function openTerms(){document.getElementById("termsModal").classList.remove("hidden");}
+function closeTerms(){document.getElementById("termsModal").classList.add("hidden");}
+
+// ── WA ──
+function buildWA(){
+  const nd=numDays(),km=estimasiKm(),jmv=jumlahMalamVal(),akmT=akomodasiMalamTotal();
+  const lines=[
+    `Halo Hamata! Saya mau booking Hiace Premio 😊`,``,
+    `*Detail Perjalanan*`,
+    `• Tipe: ${BASE_RATES[custType]?.label}`,
+    `• Tanggal: ${fmtDate(startDate)} – ${fmtDate(endDate)} (${nd} hari)`,
+    `• Rute: ${routes.join(" → ")} → Pekanbaru`,
+    `• Estimasi jarak: ±${km} km`,
+    isMultiDay()&&malamAnswer?`• Berkendara malam (22.00–05.00): ${malamAnswer==="ya"?`Ya (${jmv} malam)`:"Tidak"}`:null,
+    ``,`*Estimasi Biaya*`,
+    `• Sewa unit + driver: ${fmtRp(sewaTotal())}`,
+    addons.biosolar?`• Biosolar: ${fmtRp(biosolarTotal())}`:null,
+    addons.makan?`• Makan supir: ${fmtRp(nd*MAKAN_SUPIR)}`:null,
+    addons.akomodasi?`• Akomodasi supir: ${fmtRp(nd*AKOMODASI_SUPIR)}`:null,
+    akmT>0?`• Akomodasi berkendara malam (${jmv} malam berikutnya): ${fmtRp(akmT)}`:null,
+    surchargeTotal()>0?`• Surcharge rute jauh (${nd} hari): ${fmtRp(surchargeTotal())}`:null,
+    addons.tol?`• Tol estimasi (dihitung aktual): ${fmtRp(tolTotal())}`:null,
+    addons.penyeberangan?`• Tiket penyeberangan: ${fmtRp(penyeberanganAmt)}`:null,
+    addons.parkir?`• Parkir: ${fmtRp(nd*parkirAmt)}`:null,
+    addons.porter?`• Porter: ${fmtRp(porterAmt)}`:null,
+    ``,`*TOTAL ESTIMASI: ${fmtRp(grandTotal())}*`,
+    catatanUser?`\n*Catatan tambahan:*\n${catatanUser}`:null,
+    ``,`Mohon konfirmasi ketersediaan jadwalnya ya 🙏`,
+  ].filter(l=>l!==null).join("\n");
+  return encodeURIComponent(lines);
+}
+function openWA(){window.open(`https://wa.me/${PHONE_WA}?text=${buildWA()}`,"_blank");}
+
+// ── NAV ──
+function goStep(s){step=s;render();window.scrollTo({top:0,behavior:"smooth"});}
+function resetAll(){
+  step=1;custType=null;startDate=null;endDate=null;calOpen=true;
+  selecting="start";routes=["Pekanbaru"];customKm=null;
+  malamAnswer=null;malamMalam="";catatanUser="";agreedTerms=false;
+  addons={biosolar:true,makan:true,akomodasi:false,tol:false,penyeberangan:false,parkir:false,porter:false};
+  render();window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// ── INIT ──
+render();
+</script>
+</body>
+</html>
